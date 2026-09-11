@@ -1,3 +1,6 @@
+/* ==========================================
+   1. ĐỊNH DẠNG CHUNG & KHUNG GAME
+   ========================================== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,9 +8,9 @@
 }
 
 body {
+    background-color: #0f172a;
+    color: #ffffff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1e293b;
-    color: #f8fafc;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,10 +19,8 @@ body {
 }
 
 .game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #0f172a;
+    text-align: center;
+    background-color: #1e293b;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -27,270 +28,148 @@ body {
 }
 
 h1 {
-    color: #38bdf8;
-    margin-bottom: 4px;
-}
-
-.subtitle {
-    color: #94a3b8;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-#board {
-    display: grid;
-    gap: 2px;
-    background-color: #334155;
-    border: 4px solid #475569;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    padding: 2px;
-}
-
-.tile {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 24px;
-    border-radius: 3px;
+    margin-bottom: 15px;
+    color: #38bdf8;
 }
 
-/* 1. SÀN NHÀ & BẢN ĐỒ */
-.floor { 
-    background-color: #cbd5e1; 
+/* ==========================================
+   2. BÀN CHƠI (BOARD) & CÁC Ô CỜ (CELL)
+   ========================================== */
+.board {
+    display: grid;
+    gap: 0;
+    justify-content: center;
+    margin: 15px auto;
+    background-color: #0f172a;
+    border: 4px solid #334155;
+    border-radius: 6px;
+    overflow: hidden;
+    width: fit-content;
 }
 
-/* 2. TƯỜNG (WALL) */
-.wall {
-    background-color: transparent !important;
-    background-image: url('wall.jpg'); /* Đã đổi thành wall.jpg cho đúng định dạng ảnh của bạn */
+/* QUAN TRỌNG: Khóa kích thước 32px x 32px và gán position: relative để fix lỗi ảnh mèo bị phồng to */
+.cell {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    box-sizing: border-box;
     background-size: cover;
-    background-repeat: no-repeat;
     background-position: center;
+    background-repeat: no-repeat;
 }
 
-/* 3. THÙNG (BOX) */
-.box {
-    background-image: url('box.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+/* Sàn nhà */
+.floor {
+    background-color: #cbd5e1;
 }
-.box::after { content: "" !important; }
 
-/* 4. ĐÍCH (GOAL) */
-.goal {
-    background-color: transparent !important;
+/* Tường */
+.wall {
+    background-image: url('wall.jpg');
+    background-size: cover;
+}
+
+/* Đích */
+.target {
+    background-color: #cbd5e1;
     background-image: url('goal.png');
     background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
 }
-.goal::after { content: "" !important; }
 
-/* 5. THÙNG ĐÃ VÀO ĐÍCH */
-.box-on-goal {
-    background-image: url('box.png'), url('goal.png'); /* Box đè lên Goal */
-    background-size: contain, contain;
-    background-repeat: no-repeat, no-repeat;
-    background-position: center, center;
-}
-.box-on-goal::after { content: "" !important; }
-
-/* 6. NHÂN VẬT ĐỨNG TRÊN Ô ĐÍCH (Đã sửa: Nhân vật hiển thị đè lên ảnh Goal) */
-.player.goal {
-    background-image: url('goal.png'); /* Nền dưới là đích */
+/* Thùng */
+.box {
+    background-color: #cbd5e1;
+    background-image: url('box.png');
     background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    position: relative;
 }
 
-/* Ảnh nhân vật hiển thị đè lên trên cùng */
+/* Thùng đã vào đích */
+.box-on-target {
+    background-color: #cbd5e1;
+    background-image: url('box.png'), url('goal.png');
+    background-size: contain, contain;
+}
+
+/* Nhân vật đứng trên sàn */
+.player {
+    background-color: #cbd5e1;
+}
+
+/* Nhân vật đứng trên ô đích */
+.player-on-target {
+    background-color: #cbd5e1;
+    background-image: url('goal.png');
+    background-size: contain;
+}
+
+/* ==========================================
+   3. HIỂN THỊ ẢNH NHÂN VẬT MÈO (PLAYER)
+   ========================================== */
 .player::after,
-.player.goal::after { 
-    content: "" !important; /* Xóa emoji mèo */
+.player-on-target::after {
+    content: "" !important;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('player.png'); /* Thay đường dẫn ảnh vào đây */
-    background-size: contain;   /* Tự co giãn vừa khít ô */
+    /* Đổi 'cat.png' thành tên file/đường dẫn ảnh mèo của bạn nếu khác tên */
+    background-image: url('player.png'); 
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    z-index: 2;
+    z-index: 10; /* Đảm bảo đè lên trên ảnh Đích/Sàn */
 }
 
-/* Phím điều khiển Mobile */
-.mobile-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    margin-top: 10px;
-}
-
-.mobile-controls .row {
-    display: flex;
-    gap: 5px;
+/* ==========================================
+   4. NÚT BẤM & ĐIỀU KHIỂN DÀNH CHO ĐIỆN THOẠI
+   ========================================== */
+button, select {
+    outline: none;
+    font-family: inherit;
 }
 
 button {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: #3b82f6;
+    background-color: #0284c7;
     color: white;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-
-button:active {
-    background-color: #1d4ed8;
-    transform: scale(0.95);
-}
-
-.btn-reset {
-    background-color: #ef4444;
-    width: auto;
-    padding: 0 15px;
-}
-
-.btn-reset:active {
-    background-color: #b91c1c;
-}
-
-.desktop-controls {
-    margin-top: 10px;
-}
-
-.desktop-controls .btn-reset {
-    height: 40px;
-    font-size: 14px;
-    font-weight: bold;
-}* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1e293b;
-    color: #f8fafc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 10px;
-}
-
-.game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #0f172a;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    max-width: 100%;
-}
-
-h1 {
-    color: #38bdf8;
-    margin-bottom: 4px;
-}
-
-.subtitle {
-    color: #94a3b8;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-#board {
-    display: grid;
-    gap: 2px;
-    background-color: #334155;
-    border: 4px solid #475569;
+    border: none;
+    padding: 8px 14px;
     border-radius: 6px;
-    margin-bottom: 15px;
-    padding: 2px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.tile {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    border-radius: 3px;
+button:hover {
+    background-color: #0369a1;
 }
 
-/* Các loại ô */
-.wall { background-color: #475569; }
-.floor { background-color: #cbd5e1; }
-.goal { background-color: #fef08a; }
-
-/* Emoji đại diện đối tượng */
-.player::after { content: "🧔"; }
-.box::after { content: "📦"; }
-.box-on-goal::after { content: "✅"; }
-.goal::after { content: "🎯"; }
-.player.goal::after { content: "🧔"; }
-
-/* Phím điều khiển Mobile */
 .mobile-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 15px;
 }
 
-.mobile-controls .row {
+.mobile-controls .horizontal {
     display: flex;
-    gap: 5px;
+    gap: 6px;
 }
 
-button {
+.mobile-controls button {
     width: 50px;
     height: 50px;
-    font-size: 20px;
-    border: none;
+    font-size: 18px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 8px;
-    background-color: #3b82f6;
-    color: white;
-    cursor: pointer;
-    touch-action: manipulation;
+    background-color: #334155;
 }
 
-button:active {
-    background-color: #1d4ed8;
-    transform: scale(0.95);
-}
-
-.btn-reset {
-    background-color: #ef4444;
-    width: auto;
-    padding: 0 15px;
-}
-
-.btn-reset:active {
-    background-color: #b91c1c;
-}
-
-.desktop-controls {
-    margin-top: 10px;
-}
-
-.desktop-controls .btn-reset {
-    height: 40px;
-    font-size: 14px;
-    font-weight: bold;
+.mobile-controls button:active {
+    background-color: #0284c7;
 }
