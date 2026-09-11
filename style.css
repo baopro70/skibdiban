@@ -58,12 +58,14 @@ h1 {
 }
 
 /* 1. SÀN NHÀ & BẢN ĐỒ */
-.floor { background-color: #cbd5e1; }
+.floor { 
+    background-color: #cbd5e1; 
+}
 
 /* 2. TƯỜNG (WALL) */
 .wall {
     background-color: transparent !important;
-    background-image: url('wall.png'); /* Tên file ảnh tường của bạn */
+    background-image: url('wall.jpg'); /* Đã đổi thành wall.jpg cho đúng định dạng ảnh của bạn */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -71,35 +73,48 @@ h1 {
 
 /* 3. THÙNG (BOX) */
 .box {
-    background-image: url('box.png'); /* Tên file ảnh thùng của bạn */
+    background-image: url('box.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
-.box::after { content: "" !important; } /* Xóa emoji 📦 cũ */
+.box::after { content: "" !important; }
 
 /* 4. ĐÍCH (GOAL) */
 .goal {
     background-color: transparent !important;
-    background-image: url('goal.png'); /* Tên file ảnh đích của bạn */
+    background-image: url('goal.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
-.goal::after { content: "" !important; } /* Xóa emoji 🎯 cũ */
+.goal::after { content: "" !important; }
 
 /* 5. THÙNG ĐÃ VÀO ĐÍCH */
 .box-on-goal {
-    background-image: url('box.png'), url('goal.png');
+    background-image: url('box.png'), url('goal.png'); /* Box đè lên Goal */
     background-size: contain, contain;
     background-repeat: no-repeat, no-repeat;
     background-position: center, center;
 }
-.box-on-goal::after { content: "" !important; } /* Xóa emoji ✅ cũ */
+.box-on-goal::after { content: "" !important; }
 
-/* 6. NHÂN VẬT (Giữ nguyên emoji 🧔) */
-.player::after { content: "🐈"; }
-.player.goal::after { content: "🐈"; }
+/* 6. NHÂN VẬT ĐỨNG TRÊN Ô ĐÍCH (Đã sửa: Nhân vật hiển thị đè lên ảnh Goal) */
+.player.goal {
+    background-image: url('goal.png'); /* Nền dưới là đích */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+}
+
+/* Emoji nhân vật hiển thị đè lên trên cùng */
+.player::after,
+.player.goal::after { 
+    content: "🐈" !important; 
+    position: relative;
+    z-index: 2;
+}
 
 /* Phím điều khiển Mobile */
 .mobile-controls {
