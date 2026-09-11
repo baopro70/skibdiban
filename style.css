@@ -108,11 +108,19 @@ h1 {
     position: relative;
 }
 
-/* Emoji nhân vật hiển thị đè lên trên cùng */
+/* Ảnh nhân vật hiển thị đè lên trên cùng */
 .player::after,
 .player.goal::after { 
-    content: "🐈" !important; 
-    position: relative;
+    content: "" !important; /* Xóa emoji mèo */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('player.png'); /* Thay đường dẫn ảnh vào đây */
+    background-size: contain;   /* Tự co giãn vừa khít ô */
+    background-repeat: no-repeat;
+    background-position: center;
     z-index: 2;
 }
 
