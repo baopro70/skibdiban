@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Sokoban - 12A2 Tin Học</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>SOKOBAN</h1>
+        <p class="subtitle">Dự án Tin học 12A2</p>
+
+        <!-- Khung hiển thị bàn chơi -->
+        <div id="board"></div>
+
+        <!-- Các nút bấm dành cho điện thoại -->
+        <div class="mobile-controls">
+            <div class="row">
+                <button onclick="handleMove(0, -1)">⬆️</button>
+            </div>
+            <div class="row">
+                <button onclick="handleMove(-1, 0)">⬅️</button>
+                <button onclick="resetLevel()" class="btn-reset">🔄</button>
+                <button onclick="handleMove(1, 0)">➡️</button>
+            </div>
+            <div class="row">
+                <button onclick="handleMove(0, 1)">⬇️</button>
+            </div>
+        </div>
+
+        <div class="desktop-controls">
+            <button onclick="resetLevel()" class="btn-reset">Chơi lại màn này</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
