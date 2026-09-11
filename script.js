@@ -1,10 +1,9 @@
-// Thiết lập bản đồ game Sokoban
-// # : Tường | ' ' : Sàn | . : Đích | $ : Thùng | @ : Người chơi
+// Bản đồ dạng hình chữ nhật chuẩn (8 cột x 8 hàng)
 const levelMap = [
-    "  ##### ",
-    "  #   # ",
-    "  #$  # ",
-    "###  $##",
+    "#####   ",
+    "#   #   ",
+    "#$  #   ",
+    "### $## ",
     "#  $ $ #",
     "# # . # ",
     "#..@..# ",
@@ -14,14 +13,16 @@ const levelMap = [
 let map = [];
 let playerPos = { r: 0, c: 0 };
 
-// Khởi tạo bàn chơi
 function initGame() {
     map = levelMap.map(row => row.split(''));
     const board = document.getElementById('board');
+    if (!board) return;
+    
     board.innerHTML = '';
-
-    // Cấu hình số cột cho Grid CSS
-    board.style.gridTemplateColumns = `repeat(${map[0].length}, 42px)`;
+    
+    // Cố định kích thước số cột theo bản đồ
+    const cols = map[0].length;
+    board.style.gridTemplateColumns = `repeat(${cols}, 42px)`;
 
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < map[r].length; c++) {
@@ -37,11 +38,12 @@ function initGame() {
     renderMap();
 }
 
-// Cập nhật lại giao diện người dùng
 function renderMap() {
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < map[r].length; c++) {
             const tile = document.getElementById(`tile-${r}-${c}`);
+            if (!tile) continue;
+            
             tile.className = 'tile';
 
             const char = map[r][c];
@@ -56,7 +58,6 @@ function renderMap() {
     }
 }
 
-// Bắt sự kiện bàn phím máy tính
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp') handleMove(0, -1);
     else if (e.key === 'ArrowDown') handleMove(0, 1);
@@ -64,22 +65,25 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === 'ArrowRight') handleMove(1, 0);
 });
 
-// Xử lý di chuyển
 function handleMove(dc, dr) {
     const nr = playerPos.r + dr;
     const nc = playerPos.c + dc;
+    
+    if (nr < 0 || nr >= map.length || nc < 0 || nc >= map[0].length) return;
+    
     const targetCell = map[nr][nc];
 
-    // Di chuyển vào ô trống hoặc ô đích
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
         map[nr][nc] = targetCell === '.' ? '+' : '@';
     }
-    // Di chuyển đẩy thùng
     else if (targetCell === '$' || targetCell === '*') {
         const boxNr = nr + dr;
         const boxNc = nc + dc;
+        
+        if (boxNr < 0 || boxNr >= map.length || boxNc < 0 || boxNc >= map[0].length) return;
+        
         const boxTargetCell = map[boxNr][boxNc];
 
         if (boxTargetCell === ' ' || boxTargetCell === '.') {
@@ -94,7 +98,6 @@ function handleMove(dc, dr) {
     checkWin();
 }
 
-// Kiểm tra chiến thắng
 function checkWin() {
     let hasWon = true;
     for (let r = 0; r < map.length; r++) {
@@ -114,5 +117,7 @@ function resetLevel() {
     initGame();
 }
 
-// Chạy game khi tải trang
-initGame();
+// Chạy game khi trang load xong
+window.onload = function() {
+    initGame();
+};
