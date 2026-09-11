@@ -46,7 +46,6 @@ let currentLevelIndex = 0;
 let map = [];
 let playerPos = { r: 0, c: 0 };
 let moveHistory = [];
-
 function playSFX(id) {
     const sound = document.getElementById(id);
     if (sound) {
