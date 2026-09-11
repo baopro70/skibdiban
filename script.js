@@ -1,42 +1,45 @@
-// Ma trận 3 màn chơi chuẩn xác 100% theo hình ảnh bạn đã vẽ nét
+// Danh sách 3 màn chơi Sokoban giữ nguyên 100% ma trận của bạn
 const levels = [
     // MÀN 1: Original - 1
     [
-        "    #####    ",
-        "  ###   #    ",
-        "  #     #    ",
-        "### #$# #    ",
-        "#   # $ #    ",
-        "# $ # # #####",
-        "### ### #  ..#",
-        "  # @   # ..#",
-        "  ##### #  .#",
-        "      # #####",
-        "      #####  "
+        "  ###     ",
+        "  ## # ###",
+        " ##  ### #",
+        "## $     #",
+        "#  @ $ # #",
+        "### $### #",
+        " #   #.. #",
+        " ## ##.# #",
+        " #     ## ",
+        " #######  "
     ],
 
-    // MÀN 2: Sasquatch IV - 3
+    // MÀN 2: Mas Sasquatch - 1
     [
-        "   ######    ",
-        "   #    #    ",
-        " ### $  #    ",
-        " #  @....#   ",
-        "## $#$ # #   ",
-        "#  $   # #   ",
-        "#  ##### #   ",
-        "####   ###   "
+        "##########",
+        "#    #####",
+        "# $ $ $ ##",
+        "### # # ##",
+        "### #   ##",
+        "### ### ##",
+        "## .....@##",
+        "## $ $   #",
+        "## ### ###",
+        "##     ###",
+        "##########"
     ],
 
-    // MÀN 3: Mas Sasquatch - 1
+    // MÀN 3: Sasquatch IV - 3
     [
-        "   ######    ",
-        "   #    #    ",
-        " ### $ $#    ",
-        " #   $  #    ",
-        "## $.....@#  ",
-        "#  $ #####   ",
-        "#   ##       ",
-        "#####        "
+        "    #########",
+        "  ####     ##",
+        "  #  @ $ #  #",
+        "  #  #....# #",
+        "### $ $ $   #",
+        "### ####### #",
+        "#           #",
+        "# ######    #",
+        "######  #####"
     ]
 ];
 
@@ -45,7 +48,6 @@ let map = [];
 let playerPos = { r: 0, c: 0 };
 let moveHistory = [];
 
-// Phát âm thanh nếu có
 function playSFX(id) {
     const sound = document.getElementById(id);
     if (sound) {
@@ -54,18 +56,18 @@ function playSFX(id) {
     }
 }
 
-// Tải màn chơi và chuẩn hóa ma trận lưới
+// Tải màn chơi và căn lề lưới vuông vức
 function loadLevel(levelIdx) {
     currentLevelIndex = levelIdx;
     const rawLevel = levels[levelIdx];
 
-    // Xác định số cột tối đa để lưới hiển thị vuông vức không bị lệch
+    // Lấy chiều rộng lớn nhất để không bị méo ô
     let maxCols = 0;
     rawLevel.forEach(row => {
         if (row.length > maxCols) maxCols = row.length;
     });
 
-    // Tạo mảng 2 chiều và chèn khoảng trắng cho đủ số cột
+    // Tạo mảng 2 chiều
     map = rawLevel.map(row => {
         let arr = row.split('');
         while (arr.length < maxCols) arr.push(' ');
@@ -74,7 +76,7 @@ function loadLevel(levelIdx) {
 
     moveHistory = [];
 
-    // Tìm vị trí bắt đầu của người chơi
+    // Tìm tọa độ nhân vật
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < map[r].length; c++) {
             if (map[r][c] === '@' || map[r][c] === '+') {
@@ -85,7 +87,7 @@ function loadLevel(levelIdx) {
     renderMap();
 }
 
-// Vẽ giao diện màn chơi lên HTML
+// Vẽ giao diện màn chơi lên DOM
 function renderMap() {
     const board = document.getElementById('board');
     if (!board) return;
@@ -121,7 +123,7 @@ function renderMap() {
     }
 }
 
-// Xử lý di chuyển nhân vật và đẩy thùng
+// Xử lý bước đi và đẩy thùng
 function handleMove(dr, dc) {
     const nr = playerPos.r + dr;
     const nc = playerPos.c + dc;
@@ -134,7 +136,7 @@ function handleMove(dr, dc) {
     const prevMapState = map.map(row => [...row]);
     const prevPlayerPos = { ...playerPos };
 
-    // 1. Ô tiếp theo là sàn trống hoặc ô đích
+    // Di chuyển vào sàn/đích
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
@@ -145,7 +147,7 @@ function handleMove(dr, dc) {
         renderMap();
         checkWin();
     }
-    // 2. Ô tiếp theo là thùng
+    // Đẩy thùng
     else if (targetCell === '$' || targetCell === '*') {
         const boxNr = nr + dr;
         const boxNc = nc + dc;
@@ -166,7 +168,7 @@ function handleMove(dr, dc) {
     }
 }
 
-// Đi lại bước trước (Undo)
+// Hoàn tác bước đi
 function undoMove() {
     if (moveHistory.length === 0) return;
     const lastState = moveHistory.pop();
@@ -180,12 +182,12 @@ function restartLevel() {
     loadLevel(currentLevelIndex);
 }
 
-// Đổi màn chơi từ thẻ Select
+// Đổi màn chơi từ menu chọn
 function changeLevel(idx) {
     loadLevel(parseInt(idx, 10));
 }
 
-// Kiểm tra điều kiện chiến thắng
+// Kiểm tra điều kiện thắng
 function checkWin() {
     let hasWon = true;
     for (let r = 0; r < map.length; r++) {
@@ -212,7 +214,7 @@ function checkWin() {
     }
 }
 
-// Bắt sự kiện phím điều hướng trên bàn phím
+// Bắt sự kiện bàn phím
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') handleMove(-1, 0);
     if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') handleMove(1, 0);
@@ -220,7 +222,6 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') handleMove(0, 1);
 });
 
-// Tải màn 1 khi trang web mở lên
 window.onload = () => {
     loadLevel(0);
-};
+};i
