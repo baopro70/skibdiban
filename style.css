@@ -57,17 +57,49 @@ h1 {
     border-radius: 3px;
 }
 
-/* Các loại ô */
-.wall { background-color: #475569; }
+/* 1. SÀN NHÀ & BẢN ĐỒ */
 .floor { background-color: #cbd5e1; }
-.goal { background-color: #fef08a; }
 
-/* Emoji đại diện đối tượng */
-.player::after { content: "🧔"; }
-.box::after { content: "📦"; }
-.box-on-goal::after { content: "✅"; }
-.goal::after { content: "🎯"; }
-.player.goal::after { content: "🧔"; }
+/* 2. TƯỜNG (WALL) */
+.wall {
+    background-color: transparent !important;
+    background-image: url('wall.png'); /* Tên file ảnh tường của bạn */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 3. THÙNG (BOX) */
+.box {
+    background-image: url('box.png'); /* Tên file ảnh thùng của bạn */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.box::after { content: "" !important; } /* Xóa emoji 📦 cũ */
+
+/* 4. ĐÍCH (GOAL) */
+.goal {
+    background-color: transparent !important;
+    background-image: url('goal.png'); /* Tên file ảnh đích của bạn */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.goal::after { content: "" !important; } /* Xóa emoji 🎯 cũ */
+
+/* 5. THÙNG ĐÃ VÀO ĐÍCH */
+.box-on-goal {
+    background-image: url('box.png'), url('goal.png');
+    background-size: contain, contain;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center, center;
+}
+.box-on-goal::after { content: "" !important; } /* Xóa emoji ✅ cũ */
+
+/* 6. NHÂN VẬT (Giữ nguyên emoji 🧔) */
+.player::after { content: "🐈"; }
+.player.goal::after { content: "🐈"; }
 
 /* Phím điều khiển Mobile */
 .mobile-controls {
