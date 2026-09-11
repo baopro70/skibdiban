@@ -11,6 +11,16 @@
         <h1>SOKOBAN</h1>
         <p class="subtitle">Dự án Tin học 12A2</p>
 
+        <!-- Thanh chọn Màn chơi mới -->
+        <div style="margin-bottom: 12px; display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <label style="color: white; font-weight: bold; font-size: 14px;">Chọn màn:</label>
+            <select id="levelSelect" onchange="changeLevel(this.value)" style="padding: 6px 12px; border-radius: 6px; font-size: 14px; background: #fff; border: none; cursor: pointer; font-weight: bold;">
+                <option value="0">Màn 1 (Dễ)</option>
+                <option value="1">Màn 2 (Vừa)</option>
+                <option value="2">Màn 3 (Thử thách)</option>
+            </select>
+        </div>
+
         <!-- Khung hiển thị bàn chơi -->
         <div id="board"></div>
 
