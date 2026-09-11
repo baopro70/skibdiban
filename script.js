@@ -1,148 +1,154 @@
-// Các màn chơi
+// Danh sách 3 màn chơi chuẩn theo hình ảnh (Thứ tự từ Dễ đến Khó)
 const levels = [
-    // Màn 1: Dễ (2 thùng)
+    // MÀN 1: Original - 1 (3 thùng)
     [
-        "  ##### ",
-        "###   # ",
-        "# . $ # ",
-        "# # $ # ",
-        "# . @ # ",
-        "####### "
+        "    #####          ",
+        "  ###   #          ",
+        "  # $   #          ",
+        "### # $ #          ",
+        "# $ # $ #          ",
+        "### ### #.. #      ",
+        "  #     #.. #      ",
+        "  ##### #@. #      ",
+        "      # #####      ",
+        "      #####        "
     ],
-    // Màn 2: Vừa (3 thùng)
+
+    // MÀN 2: Sasquatch IV - 3 (4 thùng)
     [
-        "######  ",
-        "#    #  ",
-        "# #$ #  ",
-        "# $ .#  ",
-        "##$#.   ",
-        " # @.   ",
-        " ####   "
+        "   #####           ",
+        "   #   #           ",
+        " ### $ #           ",
+        " #  @..#           ",
+        "## $.. #           ",
+        "#  $ $ #           ",
+        "#  #####           ",
+        "####               "
     ],
-    // Màn 3: Thử thách (4 thùng)
+
+    // MÀN 3: Mas Sasquatch - 1 (5 thùng)
     [
-        "  ####  ",
-        "###  #  ",
-        "#    #  ",
-        "# $ $#  ",
-        "###$ #  ",
-        "#.#@ ###",
-        "#..$   #",
-        "#####..#",
-        "    ####"
+        "   ######          ",
+        "   #    #          ",
+        " ### $ $#          ",
+        " #   $  #          ",
+        "## $.....@#        ",
+        "#  $ #####         ",
+        "#   ##             ",
+        "#####              "
     ]
 ];
 
 let currentLevelIndex = 0;
 let map = [];
 let playerPos = { r: 0, c: 0 };
+let moveHistory = [];
 
-// Hàm phát âm thanh
 function playSFX(id) {
     const sound = document.getElementById(id);
     if (sound) {
-        sound.currentTime = 0; // Đặt lại âm thanh về đầu
-        sound.play().catch(() => {}); // Tránh lỗi trình duyệt chặn autostart
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
     }
 }
 
-function initGame() {
-    const currentLevelMap = levels[currentLevelIndex];
-    map = currentLevelMap.map(row => row.split(''));
+function loadLevel(levelIdx) {
+    currentLevelIndex = levelIdx;
+    const levelData = levels[levelIdx];
+    map = levelData.map(row => row.split(''));
+    moveHistory = [];
     
-    const board = document.getElementById('board');
-    if (!board) return;
-    
-    board.innerHTML = '';
-    
-    let maxCols = 0;
-    map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
-    
-    board.style.gridTemplateColumns = `repeat(${maxCols}, 42px)`;
-
     for (let r = 0; r < map.length; r++) {
-        for (let c = 0; c < maxCols; c++) {
-            const tile = document.createElement('div');
-            tile.id = `tile-${r}-${c}`;
-            tile.classList.add('tile');
-
-            const char = map[r][c] || ' ';
-            if (char === '@' || char === '+') {
+        for (let c = 0; c < map[r].length; c++) {
+            if (map[r][c] === '@' || map[r][c] === '+') {
                 playerPos = { r, c };
             }
-
-            board.appendChild(tile);
         }
     }
     renderMap();
 }
 
 function renderMap() {
-    let maxCols = 0;
-    map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
-
+    const board = document.getElementById('board');
+    if (!board) return;
+    board.innerHTML = '';
+    
+    const maxCols = Math.max(...map.map(row => row.length));
+    board.style.gridTemplateColumns = `repeat(${maxCols}, 32px)`;
+    
     for (let r = 0; r < map.length; r++) {
-        for (let c = 0; c < maxCols; c++) {
-            const tile = document.getElementById(`tile-${r}-${c}`);
-            if (!tile) continue;
-            
-            tile.className = 'tile';
+        for (let c = 0; c < map[r].length; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
             const char = map[r][c] || ' ';
-
-            if (char === '#') tile.classList.add('wall');
-            else if (char === ' ') tile.classList.add('floor');
-            else if (char === '.') tile.classList.add('goal');
-            else if (char === '$') tile.classList.add('box');
-            else if (char === '*') tile.classList.add('box-on-goal');
-            else if (char === '@') tile.classList.add('player', 'floor');
-            else if (char === '+') tile.classList.add('player', 'goal');
+            
+            if (char === '#') cell.classList.add('wall');
+            else if (char === '.') cell.classList.add('target');
+            else if (char === '$') cell.classList.add('box');
+            else if (char === '*') cell.classList.add('box-on-target');
+            else if (char === '@') cell.classList.add('player');
+            else if (char === '+') cell.classList.add('player-on-target');
+            else cell.classList.add('floor');
+            
+            board.appendChild(cell);
         }
     }
 }
 
-// Bắt sự kiện phím
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp') handleMove(0, -1);
-    else if (e.key === 'ArrowDown') handleMove(0, 1);
-    else if (e.key === 'ArrowLeft') handleMove(-1, 0);
-    else if (e.key === 'ArrowRight') handleMove(1, 0);
-});
-
-function handleMove(dc, dr) {
+function handleMove(dr, dc) {
     const nr = playerPos.r + dr;
     const nc = playerPos.c + dc;
-    
-    if (nr < 0 || nr >= map.length || nc < 0 || nc >= map[0].length) return;
+    if (nr < 0 || nr >= map.length || nc < 0 || nc >= map[nr].length) return;
     
     const targetCell = map[nr][nc];
-
-    // 1. Di chuyển vào ô trống
+    if (targetCell === '#' || targetCell === undefined) return;
+    
+    const prevMapState = map.map(row => [...row]);
+    const prevPlayerPos = { ...playerPos };
+    
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
         map[nr][nc] = targetCell === '.' ? '+' : '@';
-        playSFX('sfx-step'); // Phát tiếng bước chân
-    }
-    // 2. Đẩy thùng
-    else if (targetCell === '$' || targetCell === '*') {
+        
+        moveHistory.push({ map: prevMapState, playerPos: prevPlayerPos });
+        playSFX('sfx-step');
+        renderMap();
+        checkWin();
+    } else if (targetCell === '$' || targetCell === '*') {
         const boxNr = nr + dr;
         const boxNc = nc + dc;
-        
-        if (boxNr < 0 || boxNr >= map.length || boxNc < 0 || boxNc >= map[0].length) return;
+        if (boxNr < 0 || boxNr >= map.length || boxNc < 0 || boxNc >= map[boxNr].length) return;
         
         const boxTargetCell = map[boxNr][boxNc];
-
         if (boxTargetCell === ' ' || boxTargetCell === '.') {
             map[boxNr][boxNc] = boxTargetCell === '.' ? '*' : '$';
             map[nr][nc] = targetCell === '*' ? '+' : '@';
             map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
             playerPos = { r: nr, c: nc };
-            playSFX('sfx-push'); // Phát tiếng đẩy thùng
+            
+            moveHistory.push({ map: prevMapState, playerPos: prevPlayerPos });
+            playSFX('sfx-push');
+            renderMap();
+            checkWin();
         }
     }
+}
 
+function undoMove() {
+    if (moveHistory.length === 0) return;
+    const lastState = moveHistory.pop();
+    map = lastState.map;
+    playerPos = lastState.playerPos;
     renderMap();
-    checkWin();
+}
+
+function restartLevel() {
+    loadLevel(currentLevelIndex);
+}
+
+function changeLevel(idx) {
+    loadLevel(parseInt(idx, 10));
 }
 
 function checkWin() {
@@ -156,32 +162,26 @@ function checkWin() {
         }
     }
     if (hasWon) {
-        playSFX('sfx-win'); // Phát tiếng thắng màn
+        playSFX('sfx-win');
         setTimeout(() => {
+            alert('Chúc mừng! Bạn đã hoàn thành màn chơi!');
             if (currentLevelIndex < levels.length - 1) {
-                alert(`🎉 Xuất sắc! Bạn đã vượt qua Màn ${currentLevelIndex + 1}! Chuẩn bị sang Màn ${currentLevelIndex + 2}.`);
                 currentLevelIndex++;
-                
                 const select = document.getElementById('levelSelect');
                 if (select) select.value = currentLevelIndex;
-                
-                initGame();
-            } else {
-                alert("🏆 BẠN ĐÃ HOÀN THÀNH TOÀN BỘ GAME SOKOBAN! CỰC KỲ XUẤT SẮC!");
+                loadLevel(currentLevelIndex);
             }
         }, 200);
     }
 }
 
-function changeLevel(index) {
-    currentLevelIndex = parseInt(index);
-    initGame();
-}
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') handleMove(-1, 0);
+    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') handleMove(1, 0);
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') handleMove(0, -1);
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') handleMove(0, 1);
+});
 
-function resetLevel() {
-    initGame();
-}
-
-window.onload = function() {
-    initGame();
+window.onload = () => {
+    loadLevel(0);
 };
