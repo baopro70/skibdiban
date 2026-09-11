@@ -1,41 +1,42 @@
-// Bản đồ 3 màn chơi chuẩn xác theo hình ảnh
+// Ma trận 3 màn chơi chuẩn xác 100% theo hình ảnh bạn đã vẽ nét
 const levels = [
-    // MÀN 1: Original - 1 (3 thùng)
+    // MÀN 1: Original - 1
     [
-        "    #####",
-        "  ###   #",
-        "  # $   #",
-        "### # $ #",
-        "# $ # $ #",
-        "### ### #",
-        "  # . . #",
-        "  #####@#",
-        "      #.#",
-        "      ###"
+        "    #####    ",
+        "  ###   #    ",
+        "  #     #    ",
+        "### #$# #    ",
+        "#   # $ #    ",
+        "# $ # # #####",
+        "### ### #  ..#",
+        "  # @   # ..#",
+        "  ##### #  .#",
+        "      # #####",
+        "      #####  "
     ],
 
-    // MÀN 2: Sasquatch IV - 3 (4 thùng)
+    // MÀN 2: Sasquatch IV - 3
     [
-        "   #####",
-        "   #   #",
-        " ### $ #",
-        " #  @..#",
-        "## $.. #",
-        "#  $ $ #",
-        "#  #####",
-        "####    "
+        "   ######    ",
+        "   #    #    ",
+        " ### $  #    ",
+        " #  @....#   ",
+        "## $#$ # #   ",
+        "#  $   # #   ",
+        "#  ##### #   ",
+        "####   ###   "
     ],
 
-    // MÀN 3: Mas Sasquatch - 1 (5 thùng)
+    // MÀN 3: Mas Sasquatch - 1
     [
-        "   ######",
-        "   #    #",
-        " ### $ $#",
-        " #   $  #",
-        "## $.....",
-        "#  $ #####",
-        "#   ##    ",
-        "#####     "
+        "   ######    ",
+        "   #    #    ",
+        " ### $ $#    ",
+        " #   $  #    ",
+        "## $.....@#  ",
+        "#  $ #####   ",
+        "#   ##       ",
+        "#####        "
     ]
 ];
 
@@ -44,6 +45,7 @@ let map = [];
 let playerPos = { r: 0, c: 0 };
 let moveHistory = [];
 
+// Phát âm thanh nếu có
 function playSFX(id) {
     const sound = document.getElementById(id);
     if (sound) {
@@ -52,13 +54,27 @@ function playSFX(id) {
     }
 }
 
+// Tải màn chơi và chuẩn hóa ma trận lưới
 function loadLevel(levelIdx) {
     currentLevelIndex = levelIdx;
-    const levelData = levels[levelIdx];
-    map = levelData.map(row => row.split(''));
+    const rawLevel = levels[levelIdx];
+
+    // Xác định số cột tối đa để lưới hiển thị vuông vức không bị lệch
+    let maxCols = 0;
+    rawLevel.forEach(row => {
+        if (row.length > maxCols) maxCols = row.length;
+    });
+
+    // Tạo mảng 2 chiều và chèn khoảng trắng cho đủ số cột
+    map = rawLevel.map(row => {
+        let arr = row.split('');
+        while (arr.length < maxCols) arr.push(' ');
+        return arr;
+    });
+
     moveHistory = [];
-    
-    // Tìm vị trí người chơi
+
+    // Tìm vị trí bắt đầu của người chơi
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < map[r].length; c++) {
             if (map[r][c] === '@' || map[r][c] === '+') {
@@ -69,72 +85,79 @@ function loadLevel(levelIdx) {
     renderMap();
 }
 
+// Vẽ giao diện màn chơi lên HTML
 function renderMap() {
     const board = document.getElementById('board');
     if (!board) return;
     board.innerHTML = '';
-    
-    // Tìm chiều rộng lớn nhất của màn
-    let maxCols = 0;
-    map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
-    
+
+    const maxCols = map[0].length;
     board.style.gridTemplateColumns = `repeat(${maxCols}, 32px)`;
-    
+
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < maxCols; c++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
             const char = map[r][c] || ' ';
-            
-            if (char === '#') cell.classList.add('wall');
-            else if (char === '.') cell.classList.add('target');
-            else if (char === '$') cell.classList.add('box');
-            else if (char === '*') cell.classList.add('box-on-target');
-            else if (char === '@') cell.classList.add('player', 'floor');
-            else if (char === '+') cell.classList.add('player-on-target');
-            else cell.classList.add('floor');
-            
+
+            if (char === '#') {
+                cell.classList.add('wall');
+            } else if (char === '.') {
+                cell.classList.add('target');
+            } else if (char === '$') {
+                cell.classList.add('box');
+            } else if (char === '*') {
+                cell.classList.add('box-on-target');
+            } else if (char === '@') {
+                cell.classList.add('player', 'floor');
+            } else if (char === '+') {
+                cell.classList.add('player-on-target');
+            } else {
+                cell.classList.add('floor');
+            }
+
             board.appendChild(cell);
         }
     }
 }
 
+// Xử lý di chuyển nhân vật và đẩy thùng
 function handleMove(dr, dc) {
     const nr = playerPos.r + dr;
     const nc = playerPos.c + dc;
-    
+
     if (nr < 0 || nr >= map.length || nc < 0 || nc >= map[nr].length) return;
-    
+
     const targetCell = map[nr][nc];
     if (targetCell === '#' || targetCell === undefined) return;
-    
+
     const prevMapState = map.map(row => [...row]);
     const prevPlayerPos = { ...playerPos };
-    
-    // 1. Di chuyển vào ô trống / ô đích
+
+    // 1. Ô tiếp theo là sàn trống hoặc ô đích
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
         map[nr][nc] = targetCell === '.' ? '+' : '@';
-        
+
         moveHistory.push({ map: prevMapState, playerPos: prevPlayerPos });
         playSFX('sfx-step');
         renderMap();
         checkWin();
-    } 
-    // 2. Đẩy thùng
+    }
+    // 2. Ô tiếp theo là thùng
     else if (targetCell === '$' || targetCell === '*') {
         const boxNr = nr + dr;
         const boxNc = nc + dc;
         if (boxNr < 0 || boxNr >= map.length || boxNc < 0 || boxNc >= map[boxNr].length) return;
-        
+
         const boxTargetCell = map[boxNr][boxNc];
         if (boxTargetCell === ' ' || boxTargetCell === '.') {
             map[boxNr][boxNc] = boxTargetCell === '.' ? '*' : '$';
             map[nr][nc] = targetCell === '*' ? '+' : '@';
             map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
             playerPos = { r: nr, c: nc };
-            
+
             moveHistory.push({ map: prevMapState, playerPos: prevPlayerPos });
             playSFX('sfx-push');
             renderMap();
@@ -143,6 +166,7 @@ function handleMove(dr, dc) {
     }
 }
 
+// Đi lại bước trước (Undo)
 function undoMove() {
     if (moveHistory.length === 0) return;
     const lastState = moveHistory.pop();
@@ -151,14 +175,17 @@ function undoMove() {
     renderMap();
 }
 
+// Chơi lại màn hiện tại
 function restartLevel() {
     loadLevel(currentLevelIndex);
 }
 
+// Đổi màn chơi từ thẻ Select
 function changeLevel(idx) {
     loadLevel(parseInt(idx, 10));
 }
 
+// Kiểm tra điều kiện chiến thắng
 function checkWin() {
     let hasWon = true;
     for (let r = 0; r < map.length; r++) {
@@ -185,6 +212,7 @@ function checkWin() {
     }
 }
 
+// Bắt sự kiện phím điều hướng trên bàn phím
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') handleMove(-1, 0);
     if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') handleMove(1, 0);
@@ -192,6 +220,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') handleMove(0, 1);
 });
 
+// Tải màn 1 khi trang web mở lên
 window.onload = () => {
     loadLevel(0);
 };
