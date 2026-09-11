@@ -11,7 +11,7 @@
         <h1>SOKOBAN</h1>
         <p class="subtitle">Dự án Tin học 12A2</p>
 
-        <!-- Thanh chọn Màn chơi mới -->
+        <!-- Thanh chọn Màn chơi -->
         <div style="margin-bottom: 12px; display: flex; gap: 8px; justify-content: center; align-items: center;">
             <label style="color: white; font-weight: bold; font-size: 14px;">Chọn màn:</label>
             <select id="levelSelect" onchange="changeLevel(this.value)" style="padding: 6px 12px; border-radius: 6px; font-size: 14px; background: #fff; border: none; cursor: pointer; font-weight: bold;">
@@ -43,6 +43,11 @@
             <button onclick="resetLevel()" class="btn-reset">Chơi lại màn này</button>
         </div>
     </div>
+
+    <!-- Hệ thống Hiệu ứng Âm thanh (SFX) -->
+    <audio id="sfx-step" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+    <audio id="sfx-push" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
+    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
 
     <script src="script.js"></script>
 </body>
