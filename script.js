@@ -1,36 +1,67 @@
-// Bản đồ dạng hình chữ nhật chuẩn (8 cột x 8 hàng)
-const levelMap = [
-    "#####   ",
-    "#   #   ",
-    "#$  #   ",
-    "### $## ",
-    "#  $ $ #",
-    "# # . # ",
-    "#..@..# ",
-    "####### "
+// Danh sách 3 Màn chơi với độ khó tăng dần
+const levels = [
+    // Màn 1: Dễ (2 thùng)
+    [
+        "  ##### ",
+        "###   # ",
+        "# . $ # ",
+        "# # $ # ",
+        "# . @ # ",
+        "####### "
+    ],
+    // Màn 2: Vừa (3 thùng)
+    [
+        "######  ",
+        "#    #  ",
+        "# #$ #  ",
+        "# $ .#  ",
+        "##$#.   ",
+        " # @.   ",
+        " ####   "
+    ],
+    // Màn 3: Thử thách (4 thùng)
+    [
+        "  ####  ",
+        "###  #  ",
+        "#    #  ",
+        "# $ $#  ",
+        "###$ #  ",
+        "#.#@ ###",
+        "#..$   #",
+        "#####..#",
+        "    ####"
+    ]
 ];
 
+let currentLevelIndex = 0;
 let map = [];
 let playerPos = { r: 0, c: 0 };
 
 function initGame() {
-    map = levelMap.map(row => row.split(''));
+    const currentLevelMap = levels[currentLevelIndex];
+    map = currentLevelMap.map(row => row.split(''));
+    
     const board = document.getElementById('board');
     if (!board) return;
     
     board.innerHTML = '';
     
-    // Cố định kích thước số cột theo bản đồ
-    const cols = map[0].length;
-    board.style.gridTemplateColumns = `repeat(${cols}, 42px)`;
+    // Tìm chiều rộng lớn nhất của màn hiện tại
+    let maxCols = 0;
+    map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
+    
+    board.style.gridTemplateColumns = `repeat(${maxCols}, 42px)`;
 
     for (let r = 0; r < map.length; r++) {
-        for (let c = 0; c < map[r].length; c++) {
+        for (let c = 0; c < maxCols; c++) {
             const tile = document.createElement('div');
             tile.id = `tile-${r}-${c}`;
             tile.classList.add('tile');
 
-            if (map[r][c] === '@') playerPos = { r, c };
+            const char = map[r][c] || ' ';
+            if (char === '@' || char === '+') {
+                playerPos = { r, c };
+            }
 
             board.appendChild(tile);
         }
@@ -39,14 +70,17 @@ function initGame() {
 }
 
 function renderMap() {
+    let maxCols = 0;
+    map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
+
     for (let r = 0; r < map.length; r++) {
-        for (let c = 0; c < map[r].length; c++) {
+        for (let c = 0; c < maxCols; c++) {
             const tile = document.getElementById(`tile-${r}-${c}`);
             if (!tile) continue;
             
             tile.className = 'tile';
+            const char = map[r][c] || ' ';
 
-            const char = map[r][c];
             if (char === '#') tile.classList.add('wall');
             else if (char === ' ') tile.classList.add('floor');
             else if (char === '.') tile.classList.add('goal');
@@ -58,6 +92,7 @@ function renderMap() {
     }
 }
 
+// Lắng nghe sự kiện phím mũi tên
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp') handleMove(0, -1);
     else if (e.key === 'ArrowDown') handleMove(0, 1);
@@ -73,11 +108,13 @@ function handleMove(dc, dr) {
     
     const targetCell = map[nr][nc];
 
+    // 1. Di chuyển vào ô trống / ô đích
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
         map[nr][nc] = targetCell === '.' ? '+' : '@';
     }
+    // 2. Đẩy thùng
     else if (targetCell === '$' || targetCell === '*') {
         const boxNr = nr + dr;
         const boxNc = nc + dc;
@@ -109,15 +146,34 @@ function checkWin() {
         }
     }
     if (hasWon) {
-        setTimeout(() => alert("🎉 Xuất sắc! Bạn đã hoàn thành bài tập Tin học!"), 150);
+        setTimeout(() => {
+            if (currentLevelIndex < levels.length - 1) {
+                alert(`🎉 Xuất sắc! Bạn đã vượt qua Màn ${currentLevelIndex + 1}! Chuẩn bị sang Màn ${currentLevelIndex + 2}.`);
+                currentLevelIndex++;
+                
+                // Cập nhật lại dropdown chọn màn
+                const select = document.getElementById('levelSelect');
+                if (select) select.value = currentLevelIndex;
+                
+                initGame();
+            } else {
+                alert("🏆 BẠN ĐÃ HOÀN THÀNH TOÀN BỘ GAME SOKOBAN! CỰC KỲ XUẤT SẮC!");
+            }
+        }, 150);
     }
 }
 
+// Hàm đổi màn từ menu chọn
+function changeLevel(index) {
+    currentLevelIndex = parseInt(index);
+    initGame();
+}
+
+// Hàm chơi lại màn hiện tại
 function resetLevel() {
     initGame();
 }
 
-// Chạy game khi trang load xong
 window.onload = function() {
     initGame();
 };
