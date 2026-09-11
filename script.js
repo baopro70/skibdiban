@@ -1,41 +1,41 @@
-// Danh sách 3 màn chơi chuẩn theo hình ảnh (Thứ tự từ Dễ đến Khó)
+// Bản đồ 3 màn chơi chuẩn xác theo hình ảnh
 const levels = [
     // MÀN 1: Original - 1 (3 thùng)
     [
-        "    #####          ",
-        "  ###   #          ",
-        "  # $   #          ",
-        "### # $ #          ",
-        "# $ # $ #          ",
-        "### ### #.. #      ",
-        "  #     #.. #      ",
-        "  ##### #@. #      ",
-        "      # #####      ",
-        "      #####        "
+        "    #####",
+        "  ###   #",
+        "  # $   #",
+        "### # $ #",
+        "# $ # $ #",
+        "### ### #",
+        "  # . . #",
+        "  #####@#",
+        "      #.#",
+        "      ###"
     ],
 
     // MÀN 2: Sasquatch IV - 3 (4 thùng)
     [
-        "   #####           ",
-        "   #   #           ",
-        " ### $ #           ",
-        " #  @..#           ",
-        "## $.. #           ",
-        "#  $ $ #           ",
-        "#  #####           ",
-        "####               "
+        "   #####",
+        "   #   #",
+        " ### $ #",
+        " #  @..#",
+        "## $.. #",
+        "#  $ $ #",
+        "#  #####",
+        "####    "
     ],
 
     // MÀN 3: Mas Sasquatch - 1 (5 thùng)
     [
-        "   ######          ",
-        "   #    #          ",
-        " ### $ $#          ",
-        " #   $  #          ",
-        "## $.....@#        ",
-        "#  $ #####         ",
-        "#   ##             ",
-        "#####              "
+        "   ######",
+        "   #    #",
+        " ### $ $#",
+        " #   $  #",
+        "## $.....",
+        "#  $ #####",
+        "#   ##    ",
+        "#####     "
     ]
 ];
 
@@ -58,6 +58,7 @@ function loadLevel(levelIdx) {
     map = levelData.map(row => row.split(''));
     moveHistory = [];
     
+    // Tìm vị trí người chơi
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < map[r].length; c++) {
             if (map[r][c] === '@' || map[r][c] === '+') {
@@ -73,11 +74,14 @@ function renderMap() {
     if (!board) return;
     board.innerHTML = '';
     
-    const maxCols = Math.max(...map.map(row => row.length));
+    // Tìm chiều rộng lớn nhất của màn
+    let maxCols = 0;
+    map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
+    
     board.style.gridTemplateColumns = `repeat(${maxCols}, 32px)`;
     
     for (let r = 0; r < map.length; r++) {
-        for (let c = 0; c < map[r].length; c++) {
+        for (let c = 0; c < maxCols; c++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
             const char = map[r][c] || ' ';
@@ -86,7 +90,7 @@ function renderMap() {
             else if (char === '.') cell.classList.add('target');
             else if (char === '$') cell.classList.add('box');
             else if (char === '*') cell.classList.add('box-on-target');
-            else if (char === '@') cell.classList.add('player');
+            else if (char === '@') cell.classList.add('player', 'floor');
             else if (char === '+') cell.classList.add('player-on-target');
             else cell.classList.add('floor');
             
@@ -98,6 +102,7 @@ function renderMap() {
 function handleMove(dr, dc) {
     const nr = playerPos.r + dr;
     const nc = playerPos.c + dc;
+    
     if (nr < 0 || nr >= map.length || nc < 0 || nc >= map[nr].length) return;
     
     const targetCell = map[nr][nc];
@@ -106,6 +111,7 @@ function handleMove(dr, dc) {
     const prevMapState = map.map(row => [...row]);
     const prevPlayerPos = { ...playerPos };
     
+    // 1. Di chuyển vào ô trống / ô đích
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
@@ -115,7 +121,9 @@ function handleMove(dr, dc) {
         playSFX('sfx-step');
         renderMap();
         checkWin();
-    } else if (targetCell === '$' || targetCell === '*') {
+    } 
+    // 2. Đẩy thùng
+    else if (targetCell === '$' || targetCell === '*') {
         const boxNr = nr + dr;
         const boxNc = nc + dc;
         if (boxNr < 0 || boxNr >= map.length || boxNc < 0 || boxNc >= map[boxNr].length) return;
@@ -164,12 +172,14 @@ function checkWin() {
     if (hasWon) {
         playSFX('sfx-win');
         setTimeout(() => {
-            alert('Chúc mừng! Bạn đã hoàn thành màn chơi!');
+            alert('🎉 Chúc mừng! Bạn đã hoàn thành màn chơi!');
             if (currentLevelIndex < levels.length - 1) {
                 currentLevelIndex++;
                 const select = document.getElementById('levelSelect');
                 if (select) select.value = currentLevelIndex;
                 loadLevel(currentLevelIndex);
+            } else {
+                alert('🏆 BẠN ĐÃ HOÀN THÀNH TOÀN BỘ CÁC MÀN CHƠI!');
             }
         }, 200);
     }
