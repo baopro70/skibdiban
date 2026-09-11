@@ -1,4 +1,4 @@
-// Danh sách 3 Màn chơi với độ khó tăng dần
+// Các màn chơi
 const levels = [
     // Màn 1: Dễ (2 thùng)
     [
@@ -37,6 +37,15 @@ let currentLevelIndex = 0;
 let map = [];
 let playerPos = { r: 0, c: 0 };
 
+// Hàm phát âm thanh
+function playSFX(id) {
+    const sound = document.getElementById(id);
+    if (sound) {
+        sound.currentTime = 0; // Đặt lại âm thanh về đầu
+        sound.play().catch(() => {}); // Tránh lỗi trình duyệt chặn autostart
+    }
+}
+
 function initGame() {
     const currentLevelMap = levels[currentLevelIndex];
     map = currentLevelMap.map(row => row.split(''));
@@ -46,7 +55,6 @@ function initGame() {
     
     board.innerHTML = '';
     
-    // Tìm chiều rộng lớn nhất của màn hiện tại
     let maxCols = 0;
     map.forEach(row => { if (row.length > maxCols) maxCols = row.length; });
     
@@ -92,7 +100,7 @@ function renderMap() {
     }
 }
 
-// Lắng nghe sự kiện phím mũi tên
+// Bắt sự kiện phím
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp') handleMove(0, -1);
     else if (e.key === 'ArrowDown') handleMove(0, 1);
@@ -108,11 +116,12 @@ function handleMove(dc, dr) {
     
     const targetCell = map[nr][nc];
 
-    // 1. Di chuyển vào ô trống / ô đích
+    // 1. Di chuyển vào ô trống
     if (targetCell === ' ' || targetCell === '.') {
         map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
         playerPos = { r: nr, c: nc };
         map[nr][nc] = targetCell === '.' ? '+' : '@';
+        playSFX('sfx-step'); // Phát tiếng bước chân
     }
     // 2. Đẩy thùng
     else if (targetCell === '$' || targetCell === '*') {
@@ -128,6 +137,7 @@ function handleMove(dc, dr) {
             map[nr][nc] = targetCell === '*' ? '+' : '@';
             map[playerPos.r][playerPos.c] = map[playerPos.r][playerPos.c] === '+' ? '.' : ' ';
             playerPos = { r: nr, c: nc };
+            playSFX('sfx-push'); // Phát tiếng đẩy thùng
         }
     }
 
@@ -146,12 +156,12 @@ function checkWin() {
         }
     }
     if (hasWon) {
+        playSFX('sfx-win'); // Phát tiếng thắng màn
         setTimeout(() => {
             if (currentLevelIndex < levels.length - 1) {
                 alert(`🎉 Xuất sắc! Bạn đã vượt qua Màn ${currentLevelIndex + 1}! Chuẩn bị sang Màn ${currentLevelIndex + 2}.`);
                 currentLevelIndex++;
                 
-                // Cập nhật lại dropdown chọn màn
                 const select = document.getElementById('levelSelect');
                 if (select) select.value = currentLevelIndex;
                 
@@ -159,17 +169,15 @@ function checkWin() {
             } else {
                 alert("🏆 BẠN ĐÃ HOÀN THÀNH TOÀN BỘ GAME SOKOBAN! CỰC KỲ XUẤT SẮC!");
             }
-        }, 150);
+        }, 200);
     }
 }
 
-// Hàm đổi màn từ menu chọn
 function changeLevel(index) {
     currentLevelIndex = parseInt(index);
     initGame();
 }
 
-// Hàm chơi lại màn hiện tại
 function resetLevel() {
     initGame();
 }
