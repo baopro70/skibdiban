@@ -1,5 +1,4 @@
-// Danh sách 3 màn chơi Sokoban
-// MÀN TUTORIAL: Hướng dẫn (1 Thùng - 1 Đích
+// Danh sách 4 màn chơi Sokoban
 const levels = [
     // MÀN TUTORIAL: Hướng dẫn (1 Thùng - 1 Đích)
     [
@@ -7,7 +6,7 @@ const levels = [
         "# @$.#",
         "######"
     ],
-    // MÀN 1: Level em bé (Dễ)
+    // MÀN 1: Level em bé (Dễ) - GIỮ NGUYÊN Y CHANG MATRIX BAN ĐẦU CỦA BẠN
     [
         "###########",
         "#### ######",
@@ -20,9 +19,9 @@ const levels = [
         "##      ###",
         "##     ####",
         "###########"
-    ], // Dấu phẩy đã được thêm ở đây
+    ],
 
-    // MÀN 2: Mas Sasquatch - 1
+    // MÀN 2: Level lớp 5 (Mas Sasquatch - 1)
     [
         "##########",
         "#   ######",
@@ -37,7 +36,7 @@ const levels = [
         "##########"
     ],
 
-    // MÀN 3: Sasquatch IV - 3
+    // MÀN 3: Level Tuấn Anh (Sasquatch IV - 3)
     [
         "#########",
         "#####   #",
