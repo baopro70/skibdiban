@@ -1,18 +1,19 @@
-// Danh sách 3 màn chơi Sokoban giữ nguyên 100% ma trận của bạn
+// Danh sách 3 màn chơi Sokoban
 const levels = [
-    // MÀN 1: Level em bé (Dễ) - Đã xóa tường tô đỏ
-[
-    "  ###     ",
-    "  ## # ###",
-    " ##  ### #",
-    "## $     ",
-    "#  @ $ # ",
-    "### $### ",
-    " #   #.. ",
-    " ##   .# ",
-    " #       ",
-    " ####### "
-]
+    // MÀN 1: Level em bé (Dễ)
+    [
+        "  ###     ",
+        "  ## # ###",
+        " ##  ### #",
+        "## $     ",
+        "#  @ $ # ",
+        "### $### ",
+        " #   #.. ",
+        " ##   .# ",
+        " #       ",
+        " ####### "
+    ], // Dấu phẩy đã được thêm ở đây
+
     // MÀN 2: Mas Sasquatch - 1
     [
         "##########",
@@ -46,6 +47,7 @@ let currentLevelIndex = 0;
 let map = [];
 let playerPos = { r: 0, c: 0 };
 let moveHistory = [];
+
 function playSFX(id) {
     const sound = document.getElementById(id);
     if (sound) {
@@ -222,4 +224,4 @@ document.addEventListener('keydown', (e) => {
 
 window.onload = () => {
     loadLevel(0);
-};i
+};
