@@ -10,10 +10,11 @@
     <div class="game-container">
         <h1>Sokoban</h1>
         <div class="controls-bar" style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center;">
-            <select id="levelSelect" onchange="changeLevel(this.value)" style="padding: 6px 12px; border-radius: 6px; font-weight: bold;">
-                <option value="0">Màn 1: Level em bé (Dễ)</option>
-                <option value="1">Màn 2: Level học sinh lớp 5 (Vừa)</option>
-                <option value="2">Màn 3: Level Tuấn Anh (Khó)</option>
+            <select id="levelSelect" onchange="changeLevel(this.value)">
+    <option value="0">Tutorial (Tutorial)</option>
+    <option value="1">Màn 1: Level em bé </option>
+    <option value="2">Màn 2: Level lớp 5 </option>
+    <option value="3">Màn 3: Level Tuấn Anh </option>
             </select>
             <button onclick="restartLevel()">Chơi lại</button>
             <button onclick="undoMove()">Đi lại </button>
