@@ -1,5 +1,12 @@
 // Danh sách 3 màn chơi Sokoban
+// MÀN TUTORIAL: Hướng dẫn (1 Thùng - 1 Đích
 const levels = [
+    // MÀN TUTORIAL: Hướng dẫn (1 Thùng - 1 Đích)
+    [
+        "######",
+        "# @$.#",
+        "######"
+    ],
     // MÀN 1: Level em bé (Dễ)
     [
         "###########",
