@@ -54,6 +54,7 @@ let currentLevelIndex = 0;
 let map = [];
 let playerPos = { r: 0, c: 0 };
 let moveHistory = [];
+let isWinLocked = false;
 
 function playSFX(id) {
     const sound = document.getElementById(id);
@@ -61,6 +62,25 @@ function playSFX(id) {
         sound.currentTime = 0;
         sound.play().catch(() => {});
     }
+}
+
+function hideWinModal() {
+    const modal = document.getElementById('winModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function showWinModal(message, buttonText) {
+    const modal = document.getElementById('winModal');
+    const title = document.getElementById('winTitle');
+    const text = document.getElementById('winText');
+    const btn = document.getElementById('nextLevelBtn');
+
+    if (!modal || !title || !text || !btn) return;
+
+    title.textContent = 'Chúc mừng chiến thắng!';
+    text.textContent = message;
+    btn.textContent = buttonText;
+    modal.classList.remove('hidden');
 }
 
 // Tải màn chơi và căn lề lưới vuông vức
@@ -82,6 +102,7 @@ function loadLevel(levelIdx) {
     });
 
     moveHistory = [];
+    isWinLocked = false;
 
     // Tìm tọa độ nhân vật
     for (let r = 0; r < map.length; r++) {
@@ -92,6 +113,7 @@ function loadLevel(levelIdx) {
         }
     }
     renderMap();
+    hideWinModal();
 }
 
 // Vẽ giao diện màn chơi lên DOM
@@ -196,6 +218,8 @@ function changeLevel(idx) {
 
 // Kiểm tra điều kiện thắng
 function checkWin() {
+    if (isWinLocked) return;
+
     let hasWon = true;
     for (let r = 0; r < map.length; r++) {
         for (let c = 0; c < map[r].length; c++) {
@@ -205,21 +229,34 @@ function checkWin() {
             }
         }
     }
+
     if (hasWon) {
+        isWinLocked = true;
         playSFX('sfx-win');
+
         setTimeout(() => {
-            alert('🎉 Chúc mừng! Bạn đã hoàn thành màn chơi!');
             if (currentLevelIndex < levels.length - 1) {
-                currentLevelIndex++;
-                const select = document.getElementById('levelSelect');
-                if (select) select.value = currentLevelIndex;
-                loadLevel(currentLevelIndex);
+                showWinModal('Bạn đã hoàn thành màn chơi. Sẵn sàng cho màn tiếp theo?', 'Tiếp tục');
             } else {
-                alert('🏆 BẠN ĐÃ HOÀN THÀNH TOÀN BỘ CÁC MÀN CHƠI!');
+                showWinModal('🏆 Bạn đã hoàn thành toàn bộ các màn chơi!', 'Chơi lại từ đầu');
             }
         }, 200);
     }
 }
+
+document.getElementById('nextLevelBtn').addEventListener('click', () => {
+    const modal = document.getElementById('winModal');
+    if (modal) modal.classList.add('hidden');
+
+    if (currentLevelIndex < levels.length - 1) {
+        currentLevelIndex++;
+        const select = document.getElementById('levelSelect');
+        if (select) select.value = currentLevelIndex;
+        loadLevel(currentLevelIndex);
+    } else {
+        loadLevel(0);
+    }
+});
 
 // Bắt sự kiện bàn phím
 document.addEventListener('keydown', (e) => {

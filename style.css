@@ -1,6 +1,6 @@
 /* ==========================================
-   1. ĐỊNH DẠNG CHUNG & KHUNG GAME
-   ========================================== */
+    1. ĐỊNH DẠNG CHUNG & KHUNG GAME
+    ========================================== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -34,8 +34,8 @@ h1 {
 }
 
 /* ==========================================
-   2. BÀN CHƠI (BOARD) & CÁC Ô CỜ (CELL)
-   ========================================== */
+    2. BÀN CHƠI (BOARD) & CÁC Ô CỜ (CELL)
+    ========================================== */
 .board {
     display: grid;
     gap: 0;
@@ -104,8 +104,8 @@ h1 {
 }
 
 /* ==========================================
-   3. HIỂN THỊ ẢNH NHÂN VẬT MÈO (PLAYER)
-   ========================================== */
+    3. HIỂN THỊ ẢNH NHÂN VẬT MÈO (PLAYER)
+    ========================================== */
 .player::after,
 .player-on-target::after {
     content: "" !important;
@@ -114,17 +114,16 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    /* Đổi 'cat.png' thành tên file/đường dẫn ảnh mèo của bạn nếu khác tên */
     background-image: url('player.png'); 
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    z-index: 10; /* Đảm bảo đè lên trên ảnh Đích/Sàn */
+    z-index: 10;
 }
 
 /* ==========================================
-   4. NÚT BẤM & ĐIỀU KHIỂN DÀNH CHO ĐIỆN THOẠI
-   ========================================== */
+    4. NÚT BẤM & ĐIỀU KHIỂN DÀNH CHO ĐIỆN THOẠI
+    ========================================== */
 button, select {
     outline: none;
     font-family: inherit;
@@ -172,4 +171,86 @@ button:hover {
 
 .mobile-controls button:active {
     background-color: #0284c7;
+}
+
+/* ==========================================
+    5. MODAL CHÚC MỪNG CHIẾN THẮNG
+    ========================================== */
+.win-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    backdrop-filter: blur(3px);
+}
+
+.win-modal.hidden {
+    display: none;
+}
+
+.win-card {
+    width: min(90vw, 440px);
+    background: linear-gradient(135deg, #f8fafc, #dbeafe);
+    color: #0f172a;
+    border-radius: 22px;
+    padding: 28px 24px 20px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(59, 130, 246, 0.35);
+    animation: popIn 0.28s ease;
+    border: 3px solid rgba(59, 130, 246, 0.25);
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.trophy {
+    font-size: 52px;
+    margin-bottom: 8px;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.win-card h2 {
+    font-size: 30px;
+    margin-bottom: 10px;
+    color: #1d4ed8;
+}
+
+.win-card p {
+    font-size: 18px;
+    margin-bottom: 18px;
+    color: #334155;
+}
+
+.win-card button {
+    background: linear-gradient(135deg, #2563eb, #38bdf8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+}
+
+.win-card button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
 }
