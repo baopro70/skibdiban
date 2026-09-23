@@ -11,10 +11,10 @@
         <h1>Sokoban</h1>
         <div class="controls-bar" style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center;">
             <select id="levelSelect" onchange="changeLevel(this.value)">
-    <option value="0">Tutorial (Tutorial)</option>
-    <option value="1">Màn 1: Level em bé </option>
-    <option value="2">Màn 2: Level lớp 5 </option>
-    <option value="3">Màn 3: Level Tuấn Anh </option>
+                <option value="0">Tutorial (Tutorial)</option>
+                <option value="1">Màn 1: Level em bé </option>
+                <option value="2">Màn 2: Level lớp 5 </option>
+                <option value="3">Màn 3: Level Tuấn Anh </option>
             </select>
             <button onclick="restartLevel()">Chơi lại</button>
             <button onclick="undoMove()">Đi lại </button>
@@ -33,7 +33,15 @@
         </div>
     </div>
 
-    <!-- Âm thanh game -->
+    <div id="winModal" class="win-modal hidden" aria-hidden="true">
+        <div class="win-card">
+            <div class="trophy">🏆</div>
+            <h2 id="winTitle">Chúc mừng chiến thắng!</h2>
+            <p id="winText">Bạn đã hoàn thành màn chơi.</p>
+            <button id="nextLevelBtn">Tiếp tục</button>
+        </div>
+    </div>
+
     <audio id="sfx-step" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
     <audio id="sfx-push" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
     <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
